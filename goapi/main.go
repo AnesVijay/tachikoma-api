@@ -17,16 +17,36 @@ var AppConfig Config
 func main() {
 	configDir := os.Getenv("CONFIG_DIR")
 
-	if _, err := toml.Decode(fmt.Sprintf("%s/base.toml", configDir), &AppConfig); err != nil {
+	// dir := fmt.Sprintf("%s/base.toml", configDir)
+	// fmt.Printf("DIR: %s\n", dir)
+
+	tomlPath := fmt.Sprintf("%s/base.toml", configDir)
+
+	tomlContent, err := os.ReadFile(tomlPath)
+	if err != nil {
+		fmt.Printf("[GO API] error reading base.toml <configured path: %s>: %v\n", tomlPath, err)
+	}
+
+	if _, err := toml.Decode(string(tomlContent), &AppConfig); err != nil {
 		fmt.Printf("[GO API] error decoding base.toml: %v\n", err)
 	}
 
 	if os.Getenv("APP_ENVIRONMENT") == "production" {
-		if _, err := toml.Decode(fmt.Sprintf("%s/production.toml", configDir), &AppConfig); err != nil {
+		tomlPath = fmt.Sprintf("%s/production.toml", configDir)
+		tomlContent, err = os.ReadFile(tomlPath)
+		if err != nil {
+			fmt.Printf("[GO API] error reading production.toml <configured path: %s>: %v\n", tomlPath, err)
+		}
+		if _, err := toml.Decode(string(tomlContent), &AppConfig); err != nil {
 			fmt.Printf("[GO API] error decoding production.toml: %v\n", err)
 		}
 	} else if os.Getenv("APP_ENVIRONMENT") == "local" {
-		if _, err := toml.Decode(fmt.Sprintf("%s/local.toml", configDir), &AppConfig); err != nil {
+		tomlPath = fmt.Sprintf("%s/local.toml", configDir)
+		tomlContent, err := os.ReadFile(tomlPath)
+		if err != nil {
+			fmt.Printf("[GO API] error reading local.toml <configured path: %s>: %v\n", tomlPath, err)
+		}
+		if _, err := toml.Decode(string(tomlContent), &AppConfig); err != nil {
 			fmt.Printf("[GO API] error decoding local.toml: %v\n", err)
 		}
 	}
