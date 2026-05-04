@@ -40,7 +40,8 @@ func main() {
 		if _, err := toml.Decode(string(tomlContent), &AppConfig); err != nil {
 			fmt.Printf("[GO API] error decoding production.toml: %v\n", err)
 		}
-	} else if os.Getenv("APP_ENVIRONMENT") == "local" {
+	} else {
+		// } else if os.Getenv("APP_ENVIRONMENT") == "local" {
 		tomlPath = fmt.Sprintf("%s/local.toml", configDir)
 		tomlContent, err := os.ReadFile(tomlPath)
 		if err != nil {
@@ -67,8 +68,8 @@ func main() {
 	mux.HandleFunc("POST /addhost", addhost)
 	mux.HandleFunc("POST /removehost", removehost)
 
-	fmt.Printf("[GO API] Listening on port %s\n", AppConfig.goAPI.port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", AppConfig.goAPI.port), mux))
+	fmt.Printf("[GO API] Listening on port %d\n", AppConfig.GoAPI.Port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", AppConfig.GoAPI.Port), mux))
 }
 
 func addhost(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +79,7 @@ func addhost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if token == AppConfig.goAPI.token {
+	if token == AppConfig.GoAPI.Token {
 
 		var req GoAPIRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -110,7 +111,7 @@ func removehost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if token == AppConfig.goAPI.token {
+	if token == AppConfig.GoAPI.Token {
 
 		var req GoAPIRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

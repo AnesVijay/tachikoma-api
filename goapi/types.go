@@ -2,7 +2,7 @@ package main
 
 type Config struct {
 	DBConf databaseConfig `toml:"database"`
-	goAPI  goapiConfig    `toml:"goapi"`
+	GoAPI  goapiConfig    `toml:"goapi"`
 }
 
 type databaseConfig struct {
@@ -14,8 +14,8 @@ type databaseConfig struct {
 }
 
 type goapiConfig struct {
-	token string `toml:"token"`
-	port  string `toml:"port"`
+	Token string `toml:"token"`
+	Port  int64  `toml:"port"`
 }
 
 // --------------- HTTP handling ---------------
