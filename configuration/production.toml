@@ -1,2 +1,14 @@
 [app]
 host = "0.0.0.0"
+
+[database]
+host = "127.0.0.1"
+port = 5432
+username = "admin"
+password = "P@ssw0rd"
+database_name = "tachikoma"
+require_ssl = false
+
+[goapi]
+token = ""
+port = 2525

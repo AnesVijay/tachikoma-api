@@ -22,7 +22,7 @@ func connectToDB(host string, port int, user string, password string, dbname str
 		return nil, fmt.Errorf("goAPI failed to ping to DB: %v", err)
 	}
 
-	fmt.Println("Successfully connected to the database!")
+	fmt.Println("[GO API] Successfully connected to the database!")
 	return dbConn, nil
 }
 
@@ -36,19 +36,19 @@ func addNewHostToDB(dbConn *sql.DB, hostgroup string, hostIP string, tableName s
 		return fmt.Errorf("failed to insert row into %s: %v", tableName, err)
 	}
 
-	fmt.Println("Successfully inserted new value %s in %s", hostIP, tableName)
+	fmt.Printf("[GO API] Successfully inserted new value %s in %s\n", hostIP, tableName)
 	return nil
 }
 
 // ! <draft>
 func deleteHostFromDB(dbConn *sql.DB, hostIP string, tableName string) error {
-	query := fmt.Sprintf("DELETE FROM $s WHERE ip='$1';", tableName)
+	query := fmt.Sprintf("DELETE FROM %s WHERE ip='$1';", tableName)
 
 	_, err := dbConn.Exec(query, hostIP)
 	if err != nil {
 		return fmt.Errorf("failed to delete row in %s: %v", tableName, err)
 	}
 
-	fmt.Println("Successfully deleted host with IP(%s) in %s", hostIP, tableName)
+	fmt.Printf("[GO API] Successfully deleted host with IP(%s) in %s\n", hostIP, tableName)
 	return nil
 }

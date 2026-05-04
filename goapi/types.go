@@ -1,7 +1,8 @@
 package main
 
-type DatabaseInfo struct {
-	Config databaseConfig `toml:"database"`
+type Config struct {
+	DBConf databaseConfig `toml:"database"`
+	goAPI  goapiConfig    `toml:"goapi"`
 }
 
 type databaseConfig struct {
@@ -10,4 +11,36 @@ type databaseConfig struct {
 	User         string `toml:"username"`
 	Password     string `toml:"password"`
 	DatabaseName string `toml:"database_name"`
+}
+
+type goapiConfig struct {
+	token string `toml:"token"`
+	port  string `toml:"port"`
+}
+
+// --------------- HTTP handling ---------------
+
+type HostGroup int
+
+const (
+	DATAPK HostGroup = iota
+	ITM
+)
+
+var hostGroups = map[HostGroup]string{
+	DATAPK: "0",
+	ITM:    "1",
+}
+
+func (hg HostGroup) String() string {
+	return hostGroups[hg]
+}
+
+type GoAPIRequest struct {
+	HostIP    string    `json:"hostip"`
+	HostGroup HostGroup `json:"hostgrp"`
+}
+
+type GoAPIResponse struct {
+	Result string `json:"result"`
 }
