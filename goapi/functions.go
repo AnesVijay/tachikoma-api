@@ -44,9 +44,9 @@ func addNewHostToDB(dbConn *sql.DB, hostgroup int, hostIP string, hostname strin
 
 // ! <draft>
 func deleteHostFromDB(dbConn *sql.DB, hostIP string, tableName string) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE ip_address='$1';", tableName)
+	query := fmt.Sprintf("DELETE FROM %s WHERE ip_address='%s';", tableName, hostIP)
 
-	_, err := dbConn.Exec(query, hostIP)
+	_, err := dbConn.Exec(query)
 	if err != nil {
 		return fmt.Errorf("failed to delete row in %s: %v", tableName, err)
 	}
