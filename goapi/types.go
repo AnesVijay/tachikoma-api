@@ -38,6 +38,7 @@ func (hg HostGroup) Int() int {
 
 type GoAPIRequest struct {
 	HostIP    string    `json:"hostip"`
+	Hostname  string    `json:"hostname"`
 	HostGroup HostGroup `json:"hostgrp"`
 }
 

@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"net"
 
 	_ "github.com/lib/pq"
 )
@@ -29,12 +28,12 @@ func connectToDB(host string, port int, user string, password string, dbname str
 
 // ! <draft>
 // ! be aware of SQL Injection
-func addNewHostToDB(dbConn *sql.DB, hostgroup int, hostIP string, tableName string) error {
-	query := fmt.Sprintf("INSERT INTO %s(ip_address, groupid) VALUES ($1, $2);", tableName)
+func addNewHostToDB(dbConn *sql.DB, hostgroup int, hostIP string, hostname string, tableName string) error {
+	query := fmt.Sprintf("INSERT INTO %s(hostname, ip_address, groupid) VALUES ($1, $2, $3);", tableName)
 
-	ip := net.ParseIP(hostIP)
+	// ip := net.ParseIP(hostIP)
 
-	_, err := dbConn.Exec(query, ip, hostgroup)
+	_, err := dbConn.Exec(query, hostname, hostIP, hostgroup)
 	if err != nil {
 		return fmt.Errorf("failed to insert row into %s: %v", tableName, err)
 	}

@@ -116,7 +116,7 @@ func addhost(w http.ResponseWriter, r *http.Request) {
 		var message string
 		var resultStatus bool
 
-		e := addNewHostToDB(DBConnection, req.HostGroup.Int(), req.HostIP, "hosts")
+		e := addNewHostToDB(DBConnection, req.HostGroup.Int(), req.HostIP, req.Hostname, "hosts")
 		if e != nil {
 			message = fmt.Sprintf("Failed to add host [%s] to DB: %v", req.HostIP, e)
 			resultStatus = false
