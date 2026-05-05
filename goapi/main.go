@@ -24,7 +24,7 @@ func main() {
 
 	tomlContent, err := os.ReadFile(tomlPath)
 	if err != nil {
-		fmt.Printf("[GO API] error reading base.toml <configured path: %s>: %v\n", tomlPath, err)
+		fmt.Printf("[GO API] error reading base.toml [configured path: %s]: %v\n", tomlPath, err)
 	}
 
 	if _, err := toml.Decode(string(tomlContent), &AppConfig); err != nil {
@@ -35,7 +35,7 @@ func main() {
 		tomlPath = fmt.Sprintf("%s/production.toml", configDir)
 		tomlContent, err = os.ReadFile(tomlPath)
 		if err != nil {
-			fmt.Printf("[GO API] error reading production.toml <configured path: %s>: %v\n", tomlPath, err)
+			fmt.Printf("[GO API] error reading production.toml [configured path: %s]: %v\n", tomlPath, err)
 		}
 		if _, err := toml.Decode(string(tomlContent), &AppConfig); err != nil {
 			fmt.Printf("[GO API] error decoding production.toml: %v\n", err)
@@ -45,14 +45,14 @@ func main() {
 		tomlPath = fmt.Sprintf("%s/local.toml", configDir)
 		tomlContent, err := os.ReadFile(tomlPath)
 		if err != nil {
-			fmt.Printf("[GO API] error reading local.toml <configured path: %s>: %v\n", tomlPath, err)
+			fmt.Printf("[GO API] error reading local.toml [configured path: %s]: %v\n", tomlPath, err)
 		}
 		if _, err := toml.Decode(string(tomlContent), &AppConfig); err != nil {
 			fmt.Printf("[GO API] error decoding local.toml: %v\n", err)
 		}
 	}
 
-	// ! <draft>
+	// ! [draft]
 	dbConnection, err := connectToDB(
 		AppConfig.DBConf.Host,
 		AppConfig.DBConf.Port,
@@ -67,9 +67,33 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /addhost", addhost)
 	mux.HandleFunc("POST /removehost", removehost)
+	mux.HandleFunc("POST /status", status)
 
 	fmt.Printf("[GO API] Listening on port %d\n", AppConfig.GoAPI.Port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", AppConfig.GoAPI.Port), mux))
+}
+
+func status(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("Authorization")
+	if token == "" {
+		http.Error(w, "Missing token", http.StatusUnauthorized)
+		return
+	}
+
+	if token == AppConfig.GoAPI.Token {
+		message := "Service is UP and RUNNING"
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(GoAPIResponse{
+			Msg:    message,
+			Result: "good",
+		})
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(GoAPIResponse{
+			Msg:    "Invalid token",
+			Result: "bad",
+		})
+	}
 }
 
 func addhost(w http.ResponseWriter, r *http.Request) {
@@ -79,6 +103,8 @@ func addhost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var result string = "bad"
+
 	if token == AppConfig.GoAPI.Token {
 
 		var req GoAPIRequest
@@ -87,20 +113,33 @@ func addhost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var result string
+		var message string
+		var resultStatus bool
 
-		e := addNewHostToDB(DBConnection, req.HostGroup.String(), req.HostIP, "hosts")
+		e := addNewHostToDB(DBConnection, req.HostGroup.Int(), req.HostIP, "hosts")
 		if e != nil {
-			result = fmt.Sprintf("Failed to add host <%s> to DB: %v", req.HostIP, e)
+			message = fmt.Sprintf("Failed to add host [%s] to DB: %v", req.HostIP, e)
+			resultStatus = false
 		} else {
-			result = fmt.Sprintf("Successfully added a new host <%s> to DB", req.HostIP)
+			message = fmt.Sprintf("Successfully added a new host [%s] to DB", req.HostIP)
+			resultStatus = true
+		}
+
+		if resultStatus {
+			result = "good"
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(GoAPIResponse{Result: result})
+		json.NewEncoder(w).Encode(GoAPIResponse{
+			Msg:    message,
+			Result: result,
+		})
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(GoAPIResponse{Result: "Invalid token"})
+		json.NewEncoder(w).Encode(GoAPIResponse{
+			Msg:    "Invalid token",
+			Result: result,
+		})
 	}
 }
 
@@ -111,6 +150,8 @@ func removehost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var result string = "bad"
+
 	if token == AppConfig.GoAPI.Token {
 
 		var req GoAPIRequest
@@ -119,19 +160,32 @@ func removehost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var result string
+		var message string
+		var resultStatus bool
 
 		e := deleteHostFromDB(DBConnection, req.HostIP, "hosts")
 		if e != nil {
-			result = fmt.Sprintf("Failed to remove host <%s> from DB: %v", req.HostIP, e)
+			message = fmt.Sprintf("Failed to remove host [%s] from DB: %v", req.HostIP, e)
+			resultStatus = false
 		} else {
-			result = fmt.Sprintf("Successfully removed a host <%s> from DB", req.HostIP)
+			message = fmt.Sprintf("Successfully removed a host [%s] from DB", req.HostIP)
+			resultStatus = true
+		}
+
+		if resultStatus {
+			result = "good"
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(GoAPIResponse{Result: result})
+		json.NewEncoder(w).Encode(GoAPIResponse{
+			Msg:    message,
+			Result: result,
+		})
 	} else {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(GoAPIResponse{Result: "Invalid token"})
+		json.NewEncoder(w).Encode(GoAPIResponse{
+			Msg:    "Invalid token",
+			Result: result,
+		})
 	}
 }

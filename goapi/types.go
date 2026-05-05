@@ -27,12 +27,12 @@ const (
 	ITM
 )
 
-var hostGroups = map[HostGroup]string{
-	DATAPK: "0",
-	ITM:    "1",
+var hostGroups = map[HostGroup]int{
+	DATAPK: 0,
+	ITM:    1,
 }
 
-func (hg HostGroup) String() string {
+func (hg HostGroup) Int() int {
 	return hostGroups[hg]
 }
 
@@ -43,4 +43,5 @@ type GoAPIRequest struct {
 
 type GoAPIResponse struct {
 	Result string `json:"result"`
+	Msg    string `json:"msg"`
 }
