@@ -48,12 +48,13 @@ func main() {
 		}
 	}
 
-	dbConnection, err := connectToDB(
-		AppConfig.DBConf.Host,
-		AppConfig.DBConf.Port,
-		AppConfig.DBConf.User,
-		AppConfig.DBConf.Password,
-		AppConfig.DBConf.DatabaseName)
+	dbConnection, err := connectToDB(DBParams{
+		Host:     AppConfig.DBConf.Host,
+		Port:     AppConfig.DBConf.Port,
+		User:     AppConfig.DBConf.User,
+		Password: AppConfig.DBConf.Password,
+		DBname:   AppConfig.DBConf.DatabaseName,
+	})
 	if err != nil {
 		log.Fatalf("[GO API] Connection to DB failed: %v\n", err)
 	}
@@ -111,7 +112,12 @@ func addhost(w http.ResponseWriter, r *http.Request) {
 		var message string
 		var resultStatus bool
 
-		e := addNewHostToDB(DBConnection, req.HostGroup, req.HostIP, req.Hostname, "hosts")
+		e := addNewHostToDB(DBConnection, Params{
+			HostGroup: req.HostGroup,
+			HostIP:    req.HostIP,
+			Hostname:  req.Hostname,
+			TableName: "hosts",
+		})
 		if e != nil {
 			message = fmt.Sprintf("Failed to add host [%s] to DB: %v", req.HostIP, e)
 			resultStatus = false
@@ -158,7 +164,10 @@ func removehost(w http.ResponseWriter, r *http.Request) {
 		var message string
 		var resultStatus bool
 
-		e := deleteHostFromDB(DBConnection, req.HostIP, "hosts")
+		e := deleteHostFromDB(DBConnection, Params{
+			HostIP:    req.HostIP,
+			TableName: "hosts",
+		})
 		if e != nil {
 			message = fmt.Sprintf("Failed to remove host [%s] from DB: %v", req.HostIP, e)
 			resultStatus = false

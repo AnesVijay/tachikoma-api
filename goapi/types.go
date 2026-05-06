@@ -1,5 +1,7 @@
 package main
 
+// --------------- Configuration ---------------
+
 type Config struct {
 	DBConf databaseConfig `toml:"database"`
 	GoAPI  goapiConfig    `toml:"goapi"`
@@ -31,4 +33,21 @@ type GoAPIRequest struct {
 type GoAPIResponse struct {
 	Result string `json:"result"`
 	Msg    string `json:"msg"`
+}
+
+// --------------- Other types ---------------
+
+type Params struct {
+	Hostname  string
+	HostIP    string
+	HostGroup int
+	TableName string
+}
+
+type DBParams struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DBname   string
 }
