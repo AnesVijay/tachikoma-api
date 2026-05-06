@@ -7,7 +7,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// ! <needs_testing>
 func connectToDB(host string, port int, user string, password string, dbname string) (*sql.DB, error) {
 	connectionString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
@@ -26,8 +25,6 @@ func connectToDB(host string, port int, user string, password string, dbname str
 	return dbConn, nil
 }
 
-// ! <draft>
-// ! be aware of SQL Injection
 func addNewHostToDB(dbConn *sql.DB, hostgroup int, hostIP string, hostname string, tableName string) error {
 	query := fmt.Sprintf("INSERT INTO %s(hostname, ip_address, groupid) VALUES ($1, $2, $3);", tableName)
 
@@ -42,7 +39,6 @@ func addNewHostToDB(dbConn *sql.DB, hostgroup int, hostIP string, hostname strin
 	return nil
 }
 
-// ! <draft>
 func deleteHostFromDB(dbConn *sql.DB, hostIP string, tableName string) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE ip_address='%s';", tableName, hostIP)
 

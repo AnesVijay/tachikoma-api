@@ -52,7 +52,6 @@ func main() {
 		}
 	}
 
-	// ! [draft]
 	dbConnection, err := connectToDB(
 		AppConfig.DBConf.Host,
 		AppConfig.DBConf.Port,
